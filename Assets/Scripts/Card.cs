@@ -17,12 +17,12 @@ public class Card : MonoBehaviour
     {
         if(hasBeenPlayed == false)
         {
-
+            //Move to play area
             hasBeenPlayed = true;
         }
         else if (hasBeenPlayed == true)
         {
-
+            //Move back to hand
             hasBeenPlayed = false;
         }
     }
