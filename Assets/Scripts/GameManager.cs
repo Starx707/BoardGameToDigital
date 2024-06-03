@@ -9,7 +9,9 @@ public class GameManager : MonoBehaviour
     //Card game data
     public List<Card> deck = new List<Card>();
     public Transform[] handDeckSlots;
+    public Transform[] playSlots;
     public bool[] availableHandSlots;
+    public bool[] availablePlaySlots;
     bool newTurn = true;
 
     //Player data
@@ -49,9 +51,10 @@ public class GameManager : MonoBehaviour
                         deck.Remove(randomCard);
                         return;
                     }
-                    else
+                    else 
                     {
                         //sfx
+                        //Debug.Log("Deck full");
                         //newTurn = false;//Should prevent player from getting more cards while having max amount reached
                     }
                 }
@@ -65,10 +68,37 @@ public class GameManager : MonoBehaviour
     }
 
     //Play a card
+    public void PlayCard(GameObject card)
+    {
+        for (int i = 0; i < availablePlaySlots.Length; i++)
+        {
+            if (availablePlaySlots[i] == true)
+            {
+                card.transform.position = playSlots[i].position;
+                availablePlaySlots[i] = false;
+                Debug.Log("Played");
+                return;
+            }
+        }
+    }
 
 
     //Card back to hand
-
+    public void ReturnCardToHand(GameObject card)
+    {
+        Debug.Log("Back in hand");
+        for (int i = 0; i < availableHandSlots.Length; i++) 
+        {
+            if (availableHandSlots[i] == true)
+            {
+                //& put the card in the slot available and put it as unavailable
+                card.transform.position = handDeckSlots[i].position;
+                availablePlaySlots[i] = true;
+                availableHandSlots[i] = false;
+                return;
+            }
+        }
+    }
 
     //Open bestiary
 
@@ -126,6 +156,7 @@ public class GameManager : MonoBehaviour
         {
             remainingTime = 0;
             TimerText.text = "00:00";
+            Debug.Log("Play time is over!");
         }
         //end timer
     }

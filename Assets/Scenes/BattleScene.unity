@@ -2014,7 +2014,13 @@ MonoBehaviour:
   - {fileID: 1846536768}
   - {fileID: 30510362}
   - {fileID: 1934813392}
+  playSlots:
+  - {fileID: 1043108528}
+  - {fileID: 1401390795}
+  - {fileID: 1873581880}
+  - {fileID: 988923079}
   availableHandSlots: 0101010101
+  availablePlaySlots: 01010101
   deckAmount: {fileID: 607799782}
   TimerText: {fileID: 1404719077}
   remainingTime: 300
