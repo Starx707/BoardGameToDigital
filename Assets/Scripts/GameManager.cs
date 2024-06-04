@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     public List<Card> deck = new List<Card>();
     public Transform[] handDeckSlots;
     public Transform[] playSlots;
-    public bool[] availableHandSlots;
-    public bool[] availablePlaySlots;
+    public List<Card> availableHandSlots = new List<Card>();
+    public List<Card> availablePlaySlots = new List<Card>();
     bool newTurn = true;
 
     //Player data
@@ -37,7 +37,17 @@ public class GameManager : MonoBehaviour
             {
                 Card randomCard = deck[Random.Range(0, deck.Count)]; //get random card
 
-                for (int i = 0; i < availableHandSlots.Length; i++) //check for available spot
+                if (availableHandSlots.Count < 5)
+                {
+                    randomCard.gameObject.SetActive(true);
+                    randomCard.transform.position = handDeckSlots[availableHandSlots.Count].position;
+                    availableHandSlots.Add(randomCard);
+                    deck.Remove(randomCard);
+                    return;
+                }
+
+                /*
+                for (int i = 0; i < availableHandSlots.Count; i++) //check for available spot
                 {
                     if (availableHandSlots[i] == true)
                     {
@@ -47,7 +57,7 @@ public class GameManager : MonoBehaviour
 
                         //& put the card in the slot available and put it as unavailable
                         randomCard.transform.position = handDeckSlots[i].position;
-                        availableHandSlots[i] = false;
+                        availableHandSlots[i] = randomCard;
                         deck.Remove(randomCard);
                         return;
                     }
@@ -58,6 +68,7 @@ public class GameManager : MonoBehaviour
                         //newTurn = false;//Should prevent player from getting more cards while having max amount reached
                     }
                 }
+                */
             }
         }
         else if (newTurn == false)
@@ -70,16 +81,30 @@ public class GameManager : MonoBehaviour
     //Play a card
     public void PlayCard(GameObject card)
     {
-        for (int i = 0; i < availablePlaySlots.Length; i++)
+        if (availablePlaySlots.Count < 4)
+        {
+            card.GetComponent<Card>().StartMove(playSlots[availablePlaySlots.Count].position);
+            availableHandSlots.Remove(card.GetComponent<Card>());
+            availablePlaySlots.Add(card.GetComponent<Card>());
+            Debug.Log("Played");
+        }
+
+        for (int i = 0; i < availableHandSlots.Count; i++)
+        {
+            availableHandSlots[i].GetComponent<Card>().StartMove(handDeckSlots[i].position);
+        }
+
+        /*
+        for (int i = 0; i < availablePlaySlots.Count; i++)
         {
             if (availablePlaySlots[i] == true)
             {
                 card.transform.position = playSlots[i].position;
-                availablePlaySlots[i] = false;
+                availablePlaySlots.Remove(card.GetComponent<Card>());
                 Debug.Log("Played");
                 return;
             }
-        }
+        }*/
     }
 
 
@@ -87,17 +112,27 @@ public class GameManager : MonoBehaviour
     public void ReturnCardToHand(GameObject card)
     {
         Debug.Log("Back in hand");
-        for (int i = 0; i < availableHandSlots.Length; i++) 
+        if (availableHandSlots.Count < 5)
+        {
+            card.GetComponent<Card>().StartMove(handDeckSlots[availableHandSlots.Count].position);
+
+            availablePlaySlots.Remove(card.GetComponent<Card>());
+            availableHandSlots.Add(card.GetComponent<Card>());
+        }
+
+        /*for (int i = 0; i < availableHandSlots.Count; i++) 
         {
             if (availableHandSlots[i] == true)
             {
                 //& put the card in the slot available and put it as unavailable
+                var ind = System.Array.IndexOf(availablePlaySlots, card);
+                Debug.Log(ind);
                 card.transform.position = handDeckSlots[i].position;
-                availablePlaySlots[i] = true;
+                availablePlaySlots[ind] = true;
                 availableHandSlots[i] = false;
                 return;
             }
-        }
+        }*/
     }
 
     //Open bestiary
