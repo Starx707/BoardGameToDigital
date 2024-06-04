@@ -9,6 +9,8 @@ public class Card : MonoBehaviour
     private GameManager Gm;
     private bool move = false;
     private Vector3 movePoint = Vector3.zero;
+    public int hp = 0;
+    public int dmg = 0;
 
     private void Start()
     {

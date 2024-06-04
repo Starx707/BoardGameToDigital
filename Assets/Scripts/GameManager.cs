@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,6 +15,13 @@ public class GameManager : MonoBehaviour
     public List<Card> availableHandSlots = new List<Card>();
     public List<Card> availablePlaySlots = new List<Card>();
     bool newTurn = true;
+
+    //Enemy variables
+    public Transform[] enemyHandSlotsPos;
+    public Transform[] enemyPlaySlotsPos;
+    public List<GameObject> enemyCards = new List<GameObject>();
+    public List<Card> enemyHandSlots = new List<Card>();
+    public List<Card> enemyPlaySlots = new List<Card>();
 
     //Player data
 
@@ -139,15 +148,94 @@ public class GameManager : MonoBehaviour
 
 
     //Bell rang
-
+    // flip enemy cards
+    // Battle
 
 
     //----- "Enemy"
 
     //Card show
+    private void ShowCards()
+    {
+        for (int i = 0; i < enemyHandSlotsPos.Length; i++)
+        {
+            var c = Instantiate(enemyCards[Random.Range(0, enemyCards.Count)]);
+            c.transform.position = enemyHandSlotsPos[i].position;
+            enemyHandSlots.Add(c.GetComponent<Card>());
+        }
+    }
 
     //Cards play
+    // Randomly shuffle the enemy hand and play them
 
+    public List<Card> ShuffleHand(List<Card> hand)
+    {
+        // Fisher-Yates shuffle argorithm
+        for (int i = hand.Count - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            var temp = hand[i];
+            hand[i] = hand[j];
+            hand[j] = temp;
+        }
+        return hand;
+    }
+
+    //Cards hide&shuffle
+    // wait x seconds to let player take in enemy cards
+    // flip the cards and stack
+    // Cards play
+
+
+    //---- Battle System
+
+    // Single Battle
+    // tuple<bool, bool> battle (card A, card B)
+        // var aliveA = a.hp - b.dmg > 0
+        // var aliveB = b.hp - a.dmg > 0
+        // return new tuple <aliveA, aliveB>
+    private Tuple<bool, bool> SingleBattle(Card A, Card B)
+    {
+        bool aliveA = A.hp - B.dmg > 0;
+        bool aliveB = B.hp - A.dmg > 0;
+
+        return new Tuple<bool, bool>(aliveA, aliveB);
+    }
+
+    // Battle
+    // List<Tuple<bool,bool>> battles
+    // For i in hand
+        //battles.add singlebattle hand[i] enemyhand[i]
+        //kill kaarten waarbij alive = false
+        //return kaarten naar handen als ze leven
+
+    private void Battles(){
+        List<Tuple<bool, bool>> battles = new List<Tuple<bool, bool>>();
+        for (int i = 0; i < 4; i++)
+        {
+            battles.Add(SingleBattle(availablePlaySlots[i], enemyPlaySlots[i]));
+        }
+        for (int i = 0; i < battles.Count; i++)
+        {
+            if (battles[i].Item1 == false)
+            {
+                Destroy(availablePlaySlots[i].gameObject);
+            }
+            else
+            {
+                ReturnCardToHand(availablePlaySlots[i].gameObject);
+            }
+
+            if (battles[i].Item2 == false)
+            {
+                Destroy(enemyPlaySlots[i]);
+            }
+            else
+            {
+                //Return to enemy hand (make the function smart ass :3
+            }
+        }
+    }
 
     //---- General
 
@@ -193,6 +281,5 @@ public class GameManager : MonoBehaviour
             TimerText.text = "00:00";
             Debug.Log("Play time is over!");
         }
-        //end timer
     }
 }
