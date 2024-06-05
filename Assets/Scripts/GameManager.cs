@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviour
     public List<Card> enemyHandSlots = new List<Card>();
     public List<Card> enemyPlaySlots = new List<Card>();
     [SerializeField] private Sprite cardBack;
-    private Sprite _cardFront;
 
     [SerializeField] private float showTime = 5;
 
@@ -35,6 +34,8 @@ public class GameManager : MonoBehaviour
 
     //UI data
     public TMP_Text deckAmount;
+    [SerializeField] Button Bell;
+    private bool _isBattling = false;
 
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
@@ -43,6 +44,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         StartCoroutine(EnemyTurnStart());
+        Bell.interactable = false;
     }
 
     //>> ------ Card game ------ <<
@@ -55,13 +57,21 @@ public class GameManager : MonoBehaviour
             {
                 Card randomCard = deck[Random.Range(0, deck.Count)]; //get random card
 
-                if (availableHandSlots.Count < 5)
+                if (availablePlaySlots.Count + availableHandSlots.Count < 5)
                 {
-                    randomCard.gameObject.SetActive(true);
-                    randomCard.transform.position = handDeckSlots[availableHandSlots.Count].position;
-                    availableHandSlots.Add(randomCard);
-                    deck.Remove(randomCard);
-                    return;
+                    if (availableHandSlots.Count < 5)
+                    {
+                        randomCard.gameObject.SetActive(true);
+                        randomCard.transform.position = handDeckSlots[availableHandSlots.Count].position;
+                        availableHandSlots.Add(randomCard);
+                        deck.Remove(randomCard);
+                        return;
+                    }
+                }
+                else
+                {
+                    //Notify player, max cards reached
+                    Debug.Log("Max cards reached");
                 }
             }
         }
@@ -73,8 +83,10 @@ public class GameManager : MonoBehaviour
     }
 
     //Play a card
-    public void PlayCard(GameObject card)
+    public bool PlayCard(GameObject card)
     {
+        if (availablePlaySlots.Count >= 4) return false;
+
         if (availablePlaySlots.Count < 4)
         {
             card.GetComponent<Card>().StartMove(playSlots[availablePlaySlots.Count].position);
@@ -87,6 +99,7 @@ public class GameManager : MonoBehaviour
         {
             availableHandSlots[i].GetComponent<Card>().StartMove(handDeckSlots[i].position);
         }
+        return true;
     }
 
 
@@ -101,42 +114,68 @@ public class GameManager : MonoBehaviour
             availablePlaySlots.Remove(card.GetComponent<Card>());
             availableHandSlots.Add(card.GetComponent<Card>());
         }
+
+        else
+        {
+            // Destroy card cuz player has played too many or counter keeping track of max cards pulled
+        }
     }
 
     //-->Return to enemy hand
+    private void ReturnToEnemyHand(GameObject card)
+    {
+        Debug.Log("Back in enemy hand");
+        if (availableHandSlots.Count < 5)
+        {
+            card.GetComponent<Card>().StartMove(enemyHandSlotsPos[enemyHandSlots.Count].position);
 
+            enemyPlaySlots.Remove(card.GetComponent<Card>());
+            enemyHandSlots.Add(card.GetComponent<Card>());
+        }
+    }
 
     //-->Open bestiary
 
 
     //-->Bell rang
-    // flip enemy cards
-    // Battle
-    private void RingBell()
+    public void RingBell()
     {
+        Bell.interactable = false;
+        _isBattling = true;
 
+        Debug.Log("Bell rang");
+        foreach (Card card in enemyPlaySlots)
+        {
+            ChangeCardSprite(card._cardFront, card);
+        }
+
+        StartCoroutine(Battles());
+        
     }
-
 
     //----- "Enemy"
     IEnumerator EnemyTurnStart()
     {
         ShowCards();
         yield return new WaitForSeconds(showTime);
-        ChangeCardSprite(cardBack);
+        foreach (Card card in enemyHandSlots)
+        {
+            ChangeCardSprite(cardBack, card);
+        }
         yield return new WaitForSeconds(0.5f);
         foreach (Card c in enemyHandSlots)
         {
-            c.StartMove(enemyPlaySlotsPos[0].position);
+            c.StartMove(enemyHandSlotsPos[1].position);
         }
 
         ShuffleHand(enemyHandSlots);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         for (int i = 0; i < enemyHandSlots.Count; i++)
         {
             enemyHandSlots[i].StartMove(enemyPlaySlotsPos[i].position);
+            enemyPlaySlots.Add(enemyHandSlots[i]);
         }
-        
+        enemyHandSlots.Clear();
 
 
     }
@@ -144,7 +183,7 @@ public class GameManager : MonoBehaviour
     //Card show
     private void ShowCards()
     {
-        for (int i = 0; i < enemyHandSlotsPos.Length; i++)
+        for (int i = enemyHandSlots.Count; i < enemyHandSlotsPos.Length; i++)
         {
             var c = Instantiate(enemyCards[Random.Range(0, enemyCards.Count)]);
             c.transform.position = enemyHandSlotsPos[i].position;
@@ -155,7 +194,7 @@ public class GameManager : MonoBehaviour
     // Randomly shuffle the enemy hand and play them
     public List<Card> ShuffleHand(List<Card> hand)
     {
-        // Fisher-Yates shuffle argorithm
+        // Fisher-Yates shuffle argorithm (source in file)
         for (int i = hand.Count - 1; i > 0; i--)
         {
             int j = UnityEngine.Random.Range(0, i + 1);
@@ -167,16 +206,9 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private void ChangeCardSprite(Sprite s)
+    private void ChangeCardSprite(Sprite s, Card c)
     {
-
-        for (int i = 0; i < enemyHandSlots.Count; i++)
-        {
-            var sr = enemyHandSlots[i].gameObject.GetComponent<SpriteRenderer>();
-            //Get the card through [i]. .gameObject to reference to it .GetComponent is to get whatever is in inspector
-
-            sr.sprite = s;
-        }
+        c.gameObject.GetComponent<SpriteRenderer>().sprite = s;
     }
 
 
@@ -192,12 +224,18 @@ public class GameManager : MonoBehaviour
     }
 
     // Battle
-    private void Battles(){
+    private IEnumerator Battles(){
+        yield return new WaitForSeconds(4f);
         List<Tuple<bool, bool>> battles = new List<Tuple<bool, bool>>();
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < availablePlaySlots.Count; i++)
         {
             battles.Add(SingleBattle(availablePlaySlots[i], enemyPlaySlots[i]));
         }
+        yield return new WaitForSeconds(1);
+
+        List<Card> toBeReturned = new();
+        List<Card> returnEnemy = new();
+
         for (int i = 0; i < battles.Count; i++)
         {
             if (battles[i].Item1 == false)
@@ -206,18 +244,35 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                ReturnCardToHand(availablePlaySlots[i].gameObject);
+                toBeReturned.Add(availablePlaySlots[i]);
             }
 
             if (battles[i].Item2 == false)
             {
-                Destroy(enemyPlaySlots[i]);
+                Destroy(enemyPlaySlots[i].gameObject);
             }
             else
             {
-                //Return to enemy hand (make the function smart ass :3
+                returnEnemy.Add(enemyPlaySlots[i]);
             }
+            yield return new WaitForSeconds(1);
         }
+        foreach (Card c in toBeReturned) {
+            ReturnCardToHand(c.gameObject);
+            c.ResetPlay();
+        }
+        foreach (Card c in returnEnemy)
+        {
+            ReturnToEnemyHand(c.gameObject);
+            c.ResetPlay();
+        }
+        availablePlaySlots.Clear();
+        enemyPlaySlots.Clear();
+
+
+        yield return new WaitForSeconds(2f);
+        StartCoroutine(EnemyTurnStart()); // Resets the opponent's hand. check if can be here or needs a different spot in case a battle should end
+        _isBattling = false;
     }
 
     //---- General
@@ -261,6 +316,15 @@ public class GameManager : MonoBehaviour
             remainingTime = 0;
             TimerText.text = "00:00";
             Debug.Log("Play time is over!");
+        }
+
+        if (availablePlaySlots.Count == 4 && enemyPlaySlots.Count == 4 && !_isBattling)
+        {
+            Bell.interactable = true;
+        }
+        else
+        {
+            Bell.interactable = false;
         }
     }
 }

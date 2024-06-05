@@ -11,9 +11,11 @@ public class Card : MonoBehaviour
     private Vector3 movePoint = Vector3.zero;
     public int hp = 0;
     public int dmg = 0;
+    public Sprite _cardFront;
 
     private void Start()
     {
+        _cardFront = gameObject.GetComponent<SpriteRenderer>().sprite;
         Gm = FindAnyObjectByType<GameManager>();
     }
 
@@ -21,7 +23,7 @@ public class Card : MonoBehaviour
     {
         if (move)
         {
-            transform.position = Vector3.MoveTowards(transform.position, movePoint, 3f);
+            transform.position = Vector3.MoveTowards(transform.position, movePoint, 15f);
             if (transform.position == movePoint)
             {
                 move = false;
@@ -37,21 +39,25 @@ public class Card : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (hasBeenPlayed == false)
+        if (hasBeenPlayed == false) 
         {
             //Move to play area
             Debug.Log("Played");
-            Gm.PlayCard(this.gameObject);
-            hasBeenPlayed = true;
-            //Gm.availableHandSlots[cardIndex] = null;
+            hasBeenPlayed = Gm.PlayCard(this.gameObject); 
+            Debug.Log(hasBeenPlayed);
         }
         else if (hasBeenPlayed == true)
         {
             //Move back to hand
+            Debug.Log("returning");
             Gm.ReturnCardToHand(this.gameObject);
             hasBeenPlayed = false;
-            //Gm.availablePlaySlots[cardIndex] = this;
         }
+    }
+
+    public void ResetPlay()
+    {
+        hasBeenPlayed = false;
     }
 
 

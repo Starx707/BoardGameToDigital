@@ -144,5 +144,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardIndex: 0
-  hp: 0
-  dmg: 0
+  hp: 5
+  dmg: 4
+  _cardFront: {fileID: 0}

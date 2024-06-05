@@ -99,8 +99,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardIndex: 0
-  hp: 0
-  dmg: 0
+  hp: 3
+  dmg: 3
+  _cardFront: {fileID: 0}
 --- !u!61 &3339710733641986520
 BoxCollider2D:
   m_ObjectHideFlags: 0
