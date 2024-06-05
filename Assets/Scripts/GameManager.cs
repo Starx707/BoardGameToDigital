@@ -22,6 +22,10 @@ public class GameManager : MonoBehaviour
     public List<GameObject> enemyCards = new List<GameObject>();
     public List<Card> enemyHandSlots = new List<Card>();
     public List<Card> enemyPlaySlots = new List<Card>();
+    [SerializeField] private Sprite cardBack;
+    private Sprite _cardFront;
+
+    [SerializeField] private float showTime = 5;
 
     //Player data
 
@@ -35,6 +39,11 @@ public class GameManager : MonoBehaviour
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
     [SerializeField] float remainingTime;
+
+    private void Start()
+    {
+        StartCoroutine(EnemyTurnStart());
+    }
 
     //>> ------ Card game ------ <<
     //Drawing a card
@@ -54,30 +63,6 @@ public class GameManager : MonoBehaviour
                     deck.Remove(randomCard);
                     return;
                 }
-
-                /*
-                for (int i = 0; i < availableHandSlots.Count; i++) //check for available spot
-                {
-                    if (availableHandSlots[i] == true)
-                    {
-                        //spot open then set active
-                        randomCard.gameObject.SetActive(true);
-                        randomCard.cardIndex = i; //give index to the randomly placed card
-
-                        //& put the card in the slot available and put it as unavailable
-                        randomCard.transform.position = handDeckSlots[i].position;
-                        availableHandSlots[i] = randomCard;
-                        deck.Remove(randomCard);
-                        return;
-                    }
-                    else 
-                    {
-                        //sfx
-                        //Debug.Log("Deck full");
-                        //newTurn = false;//Should prevent player from getting more cards while having max amount reached
-                    }
-                }
-                */
             }
         }
         else if (newTurn == false)
@@ -102,18 +87,6 @@ public class GameManager : MonoBehaviour
         {
             availableHandSlots[i].GetComponent<Card>().StartMove(handDeckSlots[i].position);
         }
-
-        /*
-        for (int i = 0; i < availablePlaySlots.Count; i++)
-        {
-            if (availablePlaySlots[i] == true)
-            {
-                card.transform.position = playSlots[i].position;
-                availablePlaySlots.Remove(card.GetComponent<Card>());
-                Debug.Log("Played");
-                return;
-            }
-        }*/
     }
 
 
@@ -128,31 +101,45 @@ public class GameManager : MonoBehaviour
             availablePlaySlots.Remove(card.GetComponent<Card>());
             availableHandSlots.Add(card.GetComponent<Card>());
         }
-
-        /*for (int i = 0; i < availableHandSlots.Count; i++) 
-        {
-            if (availableHandSlots[i] == true)
-            {
-                //& put the card in the slot available and put it as unavailable
-                var ind = System.Array.IndexOf(availablePlaySlots, card);
-                Debug.Log(ind);
-                card.transform.position = handDeckSlots[i].position;
-                availablePlaySlots[ind] = true;
-                availableHandSlots[i] = false;
-                return;
-            }
-        }*/
     }
 
-    //Open bestiary
+    //-->Return to enemy hand
 
 
-    //Bell rang
+    //-->Open bestiary
+
+
+    //-->Bell rang
     // flip enemy cards
     // Battle
+    private void RingBell()
+    {
+
+    }
 
 
     //----- "Enemy"
+    IEnumerator EnemyTurnStart()
+    {
+        ShowCards();
+        yield return new WaitForSeconds(showTime);
+        ChangeCardSprite(cardBack);
+        yield return new WaitForSeconds(0.5f);
+        foreach (Card c in enemyHandSlots)
+        {
+            c.StartMove(enemyPlaySlotsPos[0].position);
+        }
+
+        ShuffleHand(enemyHandSlots);
+        yield return new WaitForSeconds(1f);
+        for (int i = 0; i < enemyHandSlots.Count; i++)
+        {
+            enemyHandSlots[i].StartMove(enemyPlaySlotsPos[i].position);
+        }
+        
+
+
+    }
 
     //Card show
     private void ShowCards()
@@ -165,9 +152,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //Cards play
     // Randomly shuffle the enemy hand and play them
-
     public List<Card> ShuffleHand(List<Card> hand)
     {
         // Fisher-Yates shuffle argorithm
@@ -181,19 +166,23 @@ public class GameManager : MonoBehaviour
         return hand;
     }
 
-    //Cards hide&shuffle
-    // wait x seconds to let player take in enemy cards
-    // flip the cards and stack
-    // Cards play
+
+    private void ChangeCardSprite(Sprite s)
+    {
+
+        for (int i = 0; i < enemyHandSlots.Count; i++)
+        {
+            var sr = enemyHandSlots[i].gameObject.GetComponent<SpriteRenderer>();
+            //Get the card through [i]. .gameObject to reference to it .GetComponent is to get whatever is in inspector
+
+            sr.sprite = s;
+        }
+    }
 
 
     //---- Battle System
 
     // Single Battle
-    // tuple<bool, bool> battle (card A, card B)
-        // var aliveA = a.hp - b.dmg > 0
-        // var aliveB = b.hp - a.dmg > 0
-        // return new tuple <aliveA, aliveB>
     private Tuple<bool, bool> SingleBattle(Card A, Card B)
     {
         bool aliveA = A.hp - B.dmg > 0;
@@ -203,12 +192,6 @@ public class GameManager : MonoBehaviour
     }
 
     // Battle
-    // List<Tuple<bool,bool>> battles
-    // For i in hand
-        //battles.add singlebattle hand[i] enemyhand[i]
-        //kill kaarten waarbij alive = false
-        //return kaarten naar handen als ze leven
-
     private void Battles(){
         List<Tuple<bool, bool>> battles = new List<Tuple<bool, bool>>();
         for (int i = 0; i < 4; i++)
@@ -247,8 +230,6 @@ public class GameManager : MonoBehaviour
 
     //Game lost
 
-
-    //Card defeated
 
 
     //>> ------ Roaming area ------ <<
