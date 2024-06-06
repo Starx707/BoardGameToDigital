@@ -14,7 +14,6 @@ public class GameManager : MonoBehaviour
     public Transform[] playSlots;
     public List<Card> availableHandSlots = new List<Card>();
     public List<Card> availablePlaySlots = new List<Card>();
-    bool newTurn = true;
 
     //Enemy variables
     public Transform[] enemyHandSlotsPos;
@@ -51,8 +50,6 @@ public class GameManager : MonoBehaviour
     //Drawing a card
     public void DrawCard()
     {
-        if (newTurn == true)
-        {
             if (deck.Count >= 1)
             {
                 Card randomCard = deck[Random.Range(0, deck.Count)]; //get random card
@@ -74,12 +71,6 @@ public class GameManager : MonoBehaviour
                     Debug.Log("Max cards reached");
                 }
             }
-        }
-        else if (newTurn == false)
-        {
-            //Tell player can't grab more cards until next turn
-            Debug.Log("Max cards for turn reached");
-        }
     }
 
     //Play a card
@@ -113,11 +104,6 @@ public class GameManager : MonoBehaviour
 
             availablePlaySlots.Remove(card.GetComponent<Card>());
             availableHandSlots.Add(card.GetComponent<Card>());
-        }
-
-        else
-        {
-            // Destroy card cuz player has played too many or counter keeping track of max cards pulled
         }
     }
 
@@ -294,6 +280,16 @@ public class GameManager : MonoBehaviour
 
 
     //>> ------ UI ------ <<
+    public void ContinueGame()
+    {
+        //Unfreeze the game
+    }
+
+    public void PauzeGame()
+    {
+        //Make sure nothing can be pressed & that the game "freezes"
+    }
+
 
 
     //Update every frame
