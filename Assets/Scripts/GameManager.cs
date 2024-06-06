@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text cardsBeatenTxt;
     [SerializeField] private TMP_Text _result;
     [SerializeField] private GameObject _resultPanel;
-    [SerializeField] private TMP_Text _playedByEnemy;
+    [SerializeField] private TMP_Text _showResult;
 
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
@@ -285,13 +285,13 @@ public class GameManager : MonoBehaviour
         if (_defeatedCards >= GoalDefeatedCards)
         {
             _result.text = "Game won!";
-            _playedByEnemy.text = "Goal: " + GoalDefeatedCards + " Defeated: " + _defeatedCards;
+            _showResult.text = "Goal: " + GoalDefeatedCards + " Defeated: " + _defeatedCards;
             Debug.Log("Game won");
         }
         else
         {
             _result.text = "Game over...";
-            _playedByEnemy.text = "Goal: " + GoalDefeatedCards + " Defeated: " + _defeatedCards;
+            _showResult.text = "Goal: " + GoalDefeatedCards + " Defeated: " + _defeatedCards;
             Debug.Log("Game lost");
         }
     }

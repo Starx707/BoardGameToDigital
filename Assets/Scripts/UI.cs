@@ -38,6 +38,8 @@ public class UI : MonoBehaviour
 
     public void ContinueGameSFX(){ } //Can delete if not all same sfx
 
+
+
     //>> ------ Generally ------ <<
     public void QuitGame()
     {
@@ -51,6 +53,18 @@ public class UI : MonoBehaviour
         }
     }
 
+    public void SFXBtn() //Only keep if want same sound for all btns
+    {
+
+    }
+
+
+    //>> ------ Card game ------ <<
+    public void PlayAgain()
+    {
+        SceneManager.LoadSceneAsync("CardGame");
+    }
+
     private void QuitWarning()
     {
         //Add warning
@@ -59,10 +73,5 @@ public class UI : MonoBehaviour
     public void AgreeToWarning()
     {
         Application.Quit();
-    }
-
-    public void SFXBtn() //Only keep if want same sound for all btns
-    {
-
     }
 }
