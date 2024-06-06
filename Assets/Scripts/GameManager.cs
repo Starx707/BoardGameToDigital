@@ -14,6 +14,9 @@ public class GameManager : MonoBehaviour
     public Transform[] playSlots;
     public List<Card> availableHandSlots = new List<Card>();
     public List<Card> availablePlaySlots = new List<Card>();
+    private int _defeatedCards = 1;
+    private bool _GameOver = false;
+    [SerializeField] private int GoalDefeatedCards;
 
     //Enemy variables
     public Transform[] enemyHandSlotsPos;
@@ -35,6 +38,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text deckAmount;
     [SerializeField] Button Bell;
     private bool _isBattling = false;
+    public TMP_Text cardsBeatenTxt;
 
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
@@ -255,6 +259,8 @@ public class GameManager : MonoBehaviour
         availablePlaySlots.Clear();
         enemyPlaySlots.Clear();
 
+        _defeatedCards += 1; //Edit this to amount cards defeated
+        CardsDefeated();
 
         yield return new WaitForSeconds(2f);
         StartCoroutine(EnemyTurnStart()); // Resets the opponent's hand. check if can be here or needs a different spot in case a battle should end
@@ -262,16 +268,30 @@ public class GameManager : MonoBehaviour
     }
 
     //---- General
+    public void CardsDefeated()
+    {
+        Debug.Log(_defeatedCards);
+        cardsBeatenTxt.text = _defeatedCards.ToString() + "/" + GoalDefeatedCards; //Shows how many cards have been defeated in total
+    }
 
-    //Turn over
-    //set newTurn to true
+    private void EndGame()
+    {
+        Debug.Log("Game end");
+        if (_defeatedCards >= GoalDefeatedCards)
+        {
+            //Call win
+            Debug.Log("Game won");
+        }
+        else
+        {
+            //Call lose
+            Debug.Log("Game lost");
+        }
+    }
 
-    //Game won
+    //Win
 
-
-    //Game lost
-
-
+    //Lose
 
     //>> ------ Roaming area ------ <<
 
@@ -311,7 +331,12 @@ public class GameManager : MonoBehaviour
         {
             remainingTime = 0;
             TimerText.text = "00:00";
-            Debug.Log("Play time is over!");
+            if (!_GameOver)
+            {
+                EndGame();
+                _GameOver = true;
+            }
+            //Call cards defeated
         }
 
         if (availablePlaySlots.Count == 4 && enemyPlaySlots.Count == 4 && !_isBattling)
