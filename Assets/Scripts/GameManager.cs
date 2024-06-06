@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     public Transform[] playSlots;
     public List<Card> availableHandSlots = new List<Card>();
     public List<Card> availablePlaySlots = new List<Card>();
-    private int _defeatedCards = 1;
+    private int _defeatedCards = 0;
     private bool _GameOver = false;
     [SerializeField] private int GoalDefeatedCards;
 
@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button Bell;
     private bool _isBattling = false;
     public TMP_Text cardsBeatenTxt;
+    [SerializeField] private TMP_Text _result;
+    [SerializeField] private GameObject resultPanel;
 
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
@@ -259,7 +261,7 @@ public class GameManager : MonoBehaviour
         availablePlaySlots.Clear();
         enemyPlaySlots.Clear();
 
-        _defeatedCards += 1; //Edit this to amount cards defeated
+        _defeatedCards = _defeatedCards + 4 - enemyHandSlots.Count; //Edit this to amount cards defeated
         CardsDefeated();
 
         yield return new WaitForSeconds(2f);
@@ -276,22 +278,19 @@ public class GameManager : MonoBehaviour
 
     private void EndGame()
     {
+        resultPanel.SetActive(true);
         Debug.Log("Game end");
         if (_defeatedCards >= GoalDefeatedCards)
         {
-            //Call win
+            _result.text = "Game won!";
             Debug.Log("Game won");
         }
         else
         {
-            //Call lose
+            _result.text = "Game over...";
             Debug.Log("Game lost");
         }
     }
-
-    //Win
-
-    //Lose
 
     //>> ------ Roaming area ------ <<
 
