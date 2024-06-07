@@ -102,6 +102,8 @@ MonoBehaviour:
   hp: 5
   dmg: 4
   _cardFront: {fileID: 0}
+  _hpTxt: {fileID: 0}
+  _dmgTxt: {fileID: 0}
 --- !u!61 &6939926729402038739
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -145,5 +147,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 5.38, y: 6.82}
   m_EdgeRadius: 0

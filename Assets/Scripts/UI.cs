@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class UI : MonoBehaviour
 {
     [SerializeField] bool InGame;
+    [SerializeField] private GameObject _warningPanel;
 
     // Start is called before the first frame update
     void Start()
@@ -46,7 +47,7 @@ public class UI : MonoBehaviour
     {
         if (InGame == true)
         {
-            //Send warning first
+            QuitWarning();
         }
         else
         {
@@ -68,7 +69,7 @@ public class UI : MonoBehaviour
 
     private void QuitWarning()
     {
-        //Add warning
+        _warningPanel.SetActive(true);
     }
 
     public void AgreeToWarning()

@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject _resultPanel;
     [SerializeField] private TMP_Text _showResult;
     [SerializeField] private GameObject _pausePanel;
+    [SerializeField] private GameObject _warningPanelPause;
 
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
@@ -317,6 +318,7 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         _pausePanel.SetActive(true);
+        _warningPanelPause.SetActive(false);
         Time.timeScale = 0;
     }
 
@@ -359,7 +361,6 @@ public class GameManager : MonoBehaviour
 
         if(_gamePaused == false && Input.GetKeyDown(KeyCode.P))
         {
-            Debug.Log("Game paused");
             _gamePaused = true;
             PauseGame();
         }

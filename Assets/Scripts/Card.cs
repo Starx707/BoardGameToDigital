@@ -1,22 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Card : MonoBehaviour
 {
     bool hasBeenPlayed;
     public int cardIndex;
     private GameManager Gm;
+
     private bool move = false;
     private Vector3 movePoint = Vector3.zero;
+
     public int hp = 0;
     public int dmg = 0;
+
     public Sprite _cardFront;
+
+    //Visual
+    [SerializeField] private TextMeshPro _hpTxt;
+    [SerializeField] private TextMeshPro _dmgTxt;
 
     private void Start()
     {
         _cardFront = gameObject.GetComponent<SpriteRenderer>().sprite;
         Gm = FindAnyObjectByType<GameManager>();
+        //_hpTxt.text = hp.ToString();
+        //_dmgTxt.text = dmg.ToString();
     }
 
     private void Update()
