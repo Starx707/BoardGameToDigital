@@ -43,10 +43,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text _result;
     [SerializeField] private GameObject _resultPanel;
     [SerializeField] private TMP_Text _showResult;
+    [SerializeField] private GameObject _pausePanel;
 
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
     [SerializeField] float remainingTime;
+
+    //Other
+    private bool _gamePaused = false;
 
     private void Start()
     {
@@ -305,12 +309,15 @@ public class GameManager : MonoBehaviour
     //>> ------ UI ------ <<
     public void ContinueGame()
     {
-        //Unfreeze the game
+        _pausePanel.SetActive(false);
+        Time.timeScale = 1;
+        _gamePaused = false;
     }
 
-    public void PauzeGame()
+    public void PauseGame()
     {
-        //Make sure nothing can be pressed & that the game "freezes"
+        _pausePanel.SetActive(true);
+        Time.timeScale = 0;
     }
 
 
@@ -339,7 +346,6 @@ public class GameManager : MonoBehaviour
                 EndGame();
                 _GameOver = true;
             }
-            //Call cards defeated
         }
 
         if (availablePlaySlots.Count == 4 && enemyPlaySlots.Count == 4 && !_isBattling)
@@ -349,6 +355,13 @@ public class GameManager : MonoBehaviour
         else
         {
             Bell.interactable = false;
+        }
+
+        if(_gamePaused == false && Input.GetKeyDown(KeyCode.P))
+        {
+            Debug.Log("Game paused");
+            _gamePaused = true;
+            PauseGame();
         }
     }
 }
