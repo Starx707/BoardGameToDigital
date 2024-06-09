@@ -33,7 +33,10 @@ public class UI : MonoBehaviour
         Time.timeScale = 1;
     }
 
-
+    public void OpenBestiary()
+    {
+        //open book sound
+    }
 
     //---- SFX
     public void PauzeGameSFX(){} //Can delete if not all same sfx

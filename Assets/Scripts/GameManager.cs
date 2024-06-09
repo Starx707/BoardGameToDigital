@@ -29,12 +29,6 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private float showTime = 5;
 
-    //Player data
-
-
-    //Roaming map data
-
-
     //UI data
     public TMP_Text deckAmount;
     [SerializeField] Button Bell;
@@ -45,6 +39,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text _showResult;
     [SerializeField] private GameObject _pausePanel;
     [SerializeField] private GameObject _warningPanelPause;
+    [SerializeField] private GameObject _bestaiary;
 
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
@@ -99,7 +94,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Played");
         }
 
-        for (int i = 0; i < availableHandSlots.Count; i++)
+        for (int i = 0; i < availableHandSlots.Count; i++) //moves the cards to the left if there is space available
         {
             availableHandSlots[i].GetComponent<Card>().StartMove(handDeckSlots[i].position);
         }
@@ -118,6 +113,8 @@ public class GameManager : MonoBehaviour
             availablePlaySlots.Remove(card.GetComponent<Card>());
             availableHandSlots.Add(card.GetComponent<Card>());
         }
+
+        //Add part where cards move to left in the availablePlaySlots
     }
 
     //-->Return to enemy hand
@@ -134,7 +131,22 @@ public class GameManager : MonoBehaviour
     }
 
     //-->Open bestiary
+    public void OpenBestiary()
+    {
+        _bestaiary.SetActive(true);
+        Time.timeScale = 0;
+    }
 
+    public void BestiaryNextpage()
+    {
+        //check on which page it is, then turn it back or forth to change it
+    }
+
+    public void CloseBestiary()
+    {
+        //Turn off bestiary panel
+        //Timescale back on
+    }
 
     //-->Bell rang
     public void RingBell()
@@ -300,12 +312,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("Game lost");
         }
     }
-
-    //>> ------ Roaming area ------ <<
-
-    //Increase deck
-    /*Can't play without 10 cards in deck*/
-
 
     //>> ------ UI ------ <<
     public void ContinueGame()

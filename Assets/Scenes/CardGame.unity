@@ -3323,7 +3323,7 @@ MonoBehaviour:
   _pausePanel: {fileID: 714000856}
   _warningPanelPause: {fileID: 1420577913}
   TimerText: {fileID: 1404719077}
-  remainingTime: 120
+  remainingTime: 300
 --- !u!1 &700946524
 GameObject:
   m_ObjectHideFlags: 0
