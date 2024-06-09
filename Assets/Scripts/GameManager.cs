@@ -40,6 +40,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject _pausePanel;
     [SerializeField] private GameObject _warningPanelPause;
     [SerializeField] private GameObject _warningMaxCards;
+    [SerializeField] private GameObject _bell;
+    [SerializeField] private Sprite _bellActive;
+    [SerializeField] private Sprite _bellInactive;
 
     [SerializeField] private GameObject _bestiary;
     [SerializeField] private GameObject _page1Panel;
@@ -111,6 +114,10 @@ public class GameManager : MonoBehaviour
         {
             availableHandSlots[i].GetComponent<Card>().StartMove(handDeckSlots[i].position);
         }
+        for (int i = 0; i < availablePlaySlots.Count; i++)
+        {
+            availablePlaySlots[i].GetComponent<Card>().StartMove(playSlots[i].position);
+        }
         return true;
     }
 
@@ -125,11 +132,6 @@ public class GameManager : MonoBehaviour
 
             availablePlaySlots.Remove(card.GetComponent<Card>());
             availableHandSlots.Add(card.GetComponent<Card>());
-        }
-
-        for (int i = 0; i < availablePlaySlots.Count; i++)
-        {
-            availablePlaySlots[i].GetComponent<Card>().StartMove(playSlots[i].position);
         }
     }
 
@@ -387,10 +389,12 @@ public class GameManager : MonoBehaviour
         if (availablePlaySlots.Count == 4 && enemyPlaySlots.Count == 4 && !_isBattling)
         {
             Bell.interactable = true;
+            _bell.GetComponent<Image>().overrideSprite = _bellActive;
         }
         else
         {
             Bell.interactable = false;
+            _bell.GetComponent<Image>().overrideSprite = _bellInactive;
         }
 
         if(_gamePaused == false && Input.GetKeyDown(KeyCode.P))
