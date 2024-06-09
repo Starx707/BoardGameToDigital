@@ -80,13 +80,19 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    _warningMaxCards.SetActive(true);
                     Debug.Log("Max cards reached");
-                    new WaitForSeconds(2);
-                    _warningMaxCards.SetActive(false);
+                    //MaxCardsReached();
                 }
             }
     }
+
+    //Show warning - think about if want to keep or no
+    //private void MaxCardsReached()
+    //{
+    //    _warningMaxCards.SetActive(true);
+    //    new WaitForSeconds(6);
+    //    _warningMaxCards.SetActive(false);
+    //}
 
     //Play a card
     public bool PlayCard(GameObject card)
