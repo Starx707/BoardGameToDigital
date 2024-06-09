@@ -39,7 +39,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text _showResult;
     [SerializeField] private GameObject _pausePanel;
     [SerializeField] private GameObject _warningPanelPause;
-    [SerializeField] private GameObject _bestaiary;
+    [SerializeField] private GameObject _warningMaxCards;
+
+    [SerializeField] private GameObject _bestiary;
+    [SerializeField] private GameObject _page1Panel;
+    [SerializeField] private GameObject _page2Panel;
+    private bool _isPage1 = true;
 
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
@@ -75,8 +80,10 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    //Notify player, max cards reached
+                    _warningMaxCards.SetActive(true);
                     Debug.Log("Max cards reached");
+                    new WaitForSeconds(2);
+                    _warningMaxCards.SetActive(false);
                 }
             }
     }
@@ -114,7 +121,10 @@ public class GameManager : MonoBehaviour
             availableHandSlots.Add(card.GetComponent<Card>());
         }
 
-        //Add part where cards move to left in the availablePlaySlots
+        for (int i = 0; i < availablePlaySlots.Count; i++)
+        {
+            availablePlaySlots[i].GetComponent<Card>().StartMove(playSlots[i].position);
+        }
     }
 
     //-->Return to enemy hand
@@ -133,19 +143,31 @@ public class GameManager : MonoBehaviour
     //-->Open bestiary
     public void OpenBestiary()
     {
-        _bestaiary.SetActive(true);
+        _bestiary.SetActive(true);
+        _page2Panel.SetActive(false);
         Time.timeScale = 0;
     }
 
     public void BestiaryNextpage()
     {
-        //check on which page it is, then turn it back or forth to change it
+        if (_isPage1 == true)
+        {
+            _page1Panel.SetActive(false);
+            _page2Panel.SetActive(true);
+            _isPage1 = false;
+        }
+        else
+        {
+            _page1Panel.SetActive(true);
+            _page2Panel.SetActive(false);
+            _isPage1 = true;
+        }
     }
 
     public void CloseBestiary()
     {
-        //Turn off bestiary panel
-        //Timescale back on
+        _bestiary.SetActive(false);
+        Time.timeScale = 1;
     }
 
     //-->Bell rang
