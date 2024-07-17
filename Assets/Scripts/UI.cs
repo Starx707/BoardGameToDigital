@@ -8,18 +8,6 @@ public class UI : MonoBehaviour
     [SerializeField] bool InGame;
     [SerializeField] private GameObject _warningPanel;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     //>> ------ Main menu ------ <<
     public void PlayGame()
     {
