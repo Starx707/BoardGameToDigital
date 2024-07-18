@@ -190,6 +190,7 @@ public class GameManager : MonoBehaviour
             ChangeCardSprite(card._cardFront, card);
         }
 
+        DeactivatePlayerCardsCollision();
         StartCoroutine(Battles());
         
     }
@@ -318,6 +319,20 @@ public class GameManager : MonoBehaviour
         _isBattling = false;
     }
 
+    private void DeactivatePlayerCardsCollision()
+    {
+        Debug.Log("Deactivate cards");
+        for (int i = 0;  deck.Count < i; i++)
+        {
+            deck[i].GetComponent<BoxCollider2D>().gameObject.SetActive(false);
+        }
+    }
+
+    private void ActivatePlayerCards()
+    {
+
+    }
+
     //---- General
     public void CardsDefeated()
     {
@@ -357,8 +372,6 @@ public class GameManager : MonoBehaviour
         _warningPanelPause.SetActive(false);
         Time.timeScale = 0;
     }
-
-
 
     //Update every frame
     private void Update()
