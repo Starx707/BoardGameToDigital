@@ -17,6 +17,8 @@ public class Card : MonoBehaviour
 
     public Sprite _cardFront;
 
+    BoxCollider2D BoxCollider;
+
     //Visual
     [SerializeField] private TextMeshPro _hpTxt;
     [SerializeField] private TextMeshPro _dmgTxt;
@@ -27,6 +29,9 @@ public class Card : MonoBehaviour
         Gm = FindAnyObjectByType<GameManager>();
         //_hpTxt.text = hp.ToString();
         //_dmgTxt.text = dmg.ToString();
+
+        BoxCollider = GetComponent<BoxCollider2D>();
+
     }
 
     private void Update()
@@ -70,5 +75,15 @@ public class Card : MonoBehaviour
         hasBeenPlayed = false;
     }
 
+    public void DisableCard()
+    {
+        Debug.Log("Disabled card collision in card");
+        BoxCollider.enabled = false;
+    }
 
+    public void EnableCard()
+    {
+        Debug.Log("Enabled card collision in card");
+        BoxCollider.enabled = true;
+    }
 }

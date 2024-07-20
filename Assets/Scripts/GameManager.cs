@@ -14,10 +14,13 @@ public class GameManager : MonoBehaviour
     public Transform[] playSlots;
     public List<Card> availableHandSlots = new List<Card>();
     public List<Card> availablePlaySlots = new List<Card>();
+    private List<Card> ToBeRetured = new List<Card>();
 
     private bool _GameOver = false;
     private int _defeatedCards = 0;
     [SerializeField] private int GoalDefeatedCards;
+
+    //[SerializeField] private BoxCollider2D ColliderCard1;
 
     //Enemy variables
     public Transform[] enemyHandSlotsPos;
@@ -60,6 +63,8 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(EnemyTurnStart());
         Bell.interactable = false;
+
+        //ColliderCard1.GetComponent<BoxCollider2D>();
     }
 
     //>> ------ Card game ------ <<
@@ -287,6 +292,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 toBeReturned.Add(availablePlaySlots[i]);
+                ToBeRetured.Add(availablePlaySlots[i]);
             }
 
             if (battles[i].Item2 == false)
@@ -310,6 +316,7 @@ public class GameManager : MonoBehaviour
         }
         availablePlaySlots.Clear();
         enemyPlaySlots.Clear();
+        ActivatePlayerCardsCollision();
 
         _defeatedCards = _defeatedCards + 4 - enemyHandSlots.Count; //Edit this to amount cards defeated
         CardsDefeated();
@@ -322,15 +329,18 @@ public class GameManager : MonoBehaviour
     private void DeactivatePlayerCardsCollision()
     {
         Debug.Log("Deactivate cards");
-        for (int i = 0;  deck.Count < i; i++)
+        foreach (Card c in availablePlaySlots) //need to save cards that have been placed when the bell was rang
         {
-            deck[i].GetComponent<BoxCollider2D>().gameObject.SetActive(false);
+            c.GetComponent<Card>().DisableCard();
         }
     }
 
-    private void ActivatePlayerCards()
+    private void ActivatePlayerCardsCollision()
     {
-
+        foreach (Card c in ToBeRetured)
+        {
+            c.GetComponent<Card>().EnableCard();
+        }
     }
 
     //---- General
