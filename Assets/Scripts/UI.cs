@@ -7,11 +7,17 @@ public class UI : MonoBehaviour
 {
     [SerializeField] bool InGame;
     [SerializeField] private GameObject _warningPanel;
+    [SerializeField] private GameManager _gm;
 
     //>> ------ Main menu ------ <<
     public void PlayGame()
     {
         SceneManager.LoadSceneAsync("CardGame");
+    }
+
+    public void PlayTutorialGame()
+    {
+        _gm.GetComponent<GameManager>().TutorialSelected();
     }
 
     //>> ------ Card game ------ <<
@@ -25,13 +31,6 @@ public class UI : MonoBehaviour
     {
         //open book sound
     }
-
-    //---- SFX
-    public void PauzeGameSFX(){} //Can delete if not all same sfx
-
-    public void ContinueGameSFX(){ } //Can delete if not all same sfx
-
-
 
     //>> ------ Generally ------ <<
     public void QuitGame()

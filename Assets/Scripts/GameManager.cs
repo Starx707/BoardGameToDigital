@@ -8,6 +8,7 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("---- Player & card game data ---")]
     //Card game data
     public List<Card> deck = new List<Card>();
     public Transform[] handDeckSlots;
@@ -22,6 +23,7 @@ public class GameManager : MonoBehaviour
 
     //[SerializeField] private BoxCollider2D ColliderCard1;
 
+    [Header("---- Enemy variables ---")]
     //Enemy variables
     public Transform[] enemyHandSlotsPos;
     public Transform[] enemyPlaySlotsPos;
@@ -32,6 +34,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private float showTime = 5;
 
+    [Header("---- UI ---")]
     //UI data
     public TMP_Text deckAmount;
     [SerializeField] Button Bell;
@@ -47,11 +50,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite _bellActive;
     [SerializeField] private Sprite _bellInactive;
 
+    [SerializeField] private GameObject _speechPanel;
+    [SerializeField] private TMP_Text _speechText;
+
     [SerializeField] private GameObject _bestiary;
     [SerializeField] private GameObject _page1Panel;
     [SerializeField] private GameObject _page2Panel;
     private bool _isPage1 = true;
 
+
+    [Header("---- Tutorial ---")]
+    //Tutorial
+    public bool tutorialActive;
+
+    [Header("---- Timer ---")]
     //Timer
     [SerializeField] TextMeshProUGUI TimerText;
     [SerializeField] float remainingTime;
@@ -63,8 +75,7 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(EnemyTurnStart());
         Bell.interactable = false;
-
-        //ColliderCard1.GetComponent<BoxCollider2D>();
+        Debug.Log(tutorialActive);
     }
 
     //>> ------ Card game ------ <<
@@ -89,11 +100,21 @@ public class GameManager : MonoBehaviour
                 else
                 {
                     Debug.Log("Max cards reached");
-                    //MaxCardsReached();
+                    StartCoroutine(MaxCardsReached());
                 }
             }
     }
 
+    private IEnumerator MaxCardsReached()
+    {
+        _speechPanel.SetActive(true);
+        _speechText.text = "You can't grab more cards mate";
+        yield return new WaitForSeconds(3.5f);
+        _speechPanel.SetActive(false);
+        yield return null;
+    }
+
+    //Make this a co-routine
     //Show warning - think about if want to keep or no
     //private void MaxCardsReached()
     //{
@@ -367,6 +388,34 @@ public class GameManager : MonoBehaviour
             Debug.Log("Game lost");
         }
     }
+
+    //>> ------ Tutorial ------ <<
+    public void TutorialSelected()
+    {
+        tutorialActive = true;
+
+    }
+
+    private IEnumerator Tutorial()
+    {
+        yield return new WaitForSeconds(3f);
+        //Pause certain parts/lengthen duration on waiting time
+        //Add text to the text below
+
+        /*
+        Goal of the battle
+        Why the battle
+        Draw cards *
+        See enemy cards (press to continue) *
+        Enemy cards then move to place
+        Pick cards themselves *
+        Press bell when ready *
+        Battle starts
+        Wait with damaging and explain hp/dmg deal
+        Beat as many cards as needed within the time/before it gets dark
+         */
+    }
+
 
     //>> ------ UI ------ <<
     public void ContinueGame()
