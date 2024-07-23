@@ -1191,7 +1191,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -0.48349, y: 53.933502}
+  m_AnchoredPosition: {x: -0.4835205, y: 53.933502}
   m_SizeDelta: {x: 17.2329, y: 476.5986}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &98682338
@@ -4164,7 +4164,7 @@ MonoBehaviour:
   _bestiary: {fileID: 1102312035}
   _page1Panel: {fileID: 246874297}
   _page2Panel: {fileID: 1163478859}
-  tutorialActive: 0
+  tutorialActive: 1
   TimerText: {fileID: 1404719077}
   remainingTime: 300
 --- !u!1 &694394988

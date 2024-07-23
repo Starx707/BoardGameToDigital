@@ -18,6 +18,7 @@ public class UI : MonoBehaviour
     public void PlayTutorialGame()
     {
         _gm.GetComponent<GameManager>().TutorialSelected();
+        SceneManager.LoadSceneAsync("CardGame");
     }
 
     //>> ------ Card game ------ <<

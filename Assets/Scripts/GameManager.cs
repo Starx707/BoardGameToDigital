@@ -62,6 +62,9 @@ public class GameManager : MonoBehaviour
     [Header("---- Tutorial ---")]
     //Tutorial
     public bool tutorialActive;
+    private bool _playerCardsDrawn;
+    private bool _bellRang;
+    private bool _enemyHasPlacedCards;
 
     [Header("---- Timer ---")]
     //Timer
@@ -73,7 +76,15 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(EnemyTurnStart());
+        //add if not tutorial then enemy turn start otherwise don't run at all, it will get called
+        if (!tutorialActive)
+        {
+            StartCoroutine(EnemyTurnStart());
+        }
+        else
+        {
+            StartCoroutine(Tutorial());
+        }
         Bell.interactable = false;
         Debug.Log(tutorialActive);
     }
@@ -99,8 +110,15 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Max cards reached");
+                Debug.Log("Max cards reached");
+                if (tutorialActive)
+                {
+                    _playerCardsDrawn = true;
+                }
+                else
+                {
                     StartCoroutine(MaxCardsReached());
+                }
                 }
             }
     }
@@ -113,15 +131,6 @@ public class GameManager : MonoBehaviour
         _speechPanel.SetActive(false);
         yield return null;
     }
-
-    //Make this a co-routine
-    //Show warning - think about if want to keep or no
-    //private void MaxCardsReached()
-    //{
-    //    _warningMaxCards.SetActive(true);
-    //    new WaitForSeconds(6);
-    //    _warningMaxCards.SetActive(false);
-    //}
 
     //Play a card
     public bool PlayCard(GameObject card)
@@ -215,10 +224,13 @@ public class GameManager : MonoBehaviour
         {
             ChangeCardSprite(card._cardFront, card);
         }
-
+        _bellRang = true;
         DeactivatePlayerCardsCollision();
-        StartCoroutine(Battles());
-        
+        //this prevents the coroutine to start too early during the tutorial
+        if (!tutorialActive)
+        {
+            StartCoroutine(Battles());
+        }
     }
 
     //----- "Enemy"
@@ -244,7 +256,7 @@ public class GameManager : MonoBehaviour
             enemyPlaySlots.Add(enemyHandSlots[i]);
         }
         enemyHandSlots.Clear();
-
+        _enemyHasPlacedCards = true;
 
     }
 
@@ -390,29 +402,59 @@ public class GameManager : MonoBehaviour
     }
 
     //>> ------ Tutorial ------ <<
-    public void TutorialSelected()
+    public void TutorialSelected()//just make sure this gets triggered
     {
-        tutorialActive = true;
-
+        tutorialActive = true; 
     }
 
-    private IEnumerator Tutorial()
+    private IEnumerator Tutorial() //call at start
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
         //Pause certain parts/lengthen duration on waiting time
         //Add text to the text below
+        Debug.Log("Tutorial level");
+        _speechPanel.SetActive(true);
+        _speechText.text = "Welcome to the game table";
+        yield return new WaitForSeconds(3.5f);
+        _speechText.text = "So here’s how it works";
+        yield return new WaitForSeconds(3.5f);
+        _speechText.text = "You, my friend, are trying to protect your territory from incoming enemies";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "Your forest friends are there to help you";
+        yield return new WaitForSeconds(3.5f);
+        _speechText.text = "You can get cards on your right side";
+        yield return new WaitForSeconds(3.5f);
+
+        _speechText.text = "‘Left click’ to interact and draw cards";
+        yield return new WaitUntil(() => _playerCardsDrawn == true);
+
+        _speechText.text = "I will grab some cards as well";
+        StartCoroutine(EnemyTurnStart());
+        yield return new WaitUntil( () => _enemyHasPlacedCards == true);
+
+        _speechText.text = "Now choose your cards and place them in front of you.";
+        yield return new WaitForSeconds(3.5f);
+        _speechText.text = "And when you’re ready, ring the bell";
+        yield return new WaitUntil(() => _bellRang == true);
+
+
+        //condition that if they hit the bell this will continue
+        //_speechText.text = "Before battle, you’ll get to see my cards for a moment before I place them";
+        //yield return new WaitForSeconds(3.5f);
 
         /*
         Goal of the battle
         Why the battle
         Draw cards *
-        See enemy cards (press to continue) *
+        See enemy cards (press 'space' to continue) *
         Enemy cards then move to place
         Pick cards themselves *
         Press bell when ready *
-        Battle starts
+        Battle starts -> pauze after the cards have been turned
         Wait with damaging and explain hp/dmg deal
-        Beat as many cards as needed within the time/before it gets dark
+        Explain that remaining cards keep their stats by the end of battle
+        Player may always see which cards 'I' use before battle
+        Beat as many cards as needed within the time to protect your lands
          */
     }
 
@@ -438,22 +480,25 @@ public class GameManager : MonoBehaviour
 
         deckAmount.text = deck.Count.ToString(); //cards in deck to UI
 
-        //Timer
-        int minutes = Mathf.FloorToInt(remainingTime / 60);
-        int seconds = Mathf.FloorToInt(remainingTime % 60);
-        TimerText.text = string.Format("{00:00}:{01:00}", minutes, seconds);
-        if (remainingTime > 0)
+        if (!tutorialActive)
         {
-            remainingTime -= Time.deltaTime;
-        }
-        else if (remainingTime < 0)
-        {
-            remainingTime = 0;
-            TimerText.text = "00:00";
-            if (!_GameOver)
+            //Timer
+            int minutes = Mathf.FloorToInt(remainingTime / 60);
+            int seconds = Mathf.FloorToInt(remainingTime % 60);
+            TimerText.text = string.Format("{00:00}:{01:00}", minutes, seconds);
+            if (remainingTime > 0)
             {
-                EndGame();
-                _GameOver = true;
+                remainingTime -= Time.deltaTime;
+            }
+            else if (remainingTime < 0)
+            {
+                remainingTime = 0;
+                TimerText.text = "00:00";
+                if (!_GameOver)
+                {
+                    EndGame();
+                    _GameOver = true;
+                }
             }
         }
 
