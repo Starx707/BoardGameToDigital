@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using Random = UnityEngine.Random;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -58,6 +59,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject _page2Panel;
     private bool _isPage1 = true;
 
+    [Header("---- Audio ---")]
+    [SerializeField] GameObject _audioM;
+    [SerializeField] AudioClip _bellSoundEffect;
+    [SerializeField] AudioClip _cardSoundEffect;
 
     [Header("---- Tutorial ---")]
     //Tutorial
@@ -65,6 +70,8 @@ public class GameManager : MonoBehaviour
     private bool _playerCardsDrawn;
     private bool _bellRang;
     private bool _enemyHasPlacedCards;
+    //private bool _cardsReturnedToHand;
+    private bool _battleOver;
 
     [Header("---- Timer ---")]
     //Timer
@@ -167,6 +174,7 @@ public class GameManager : MonoBehaviour
 
             availablePlaySlots.Remove(card.GetComponent<Card>());
             availableHandSlots.Add(card.GetComponent<Card>());
+
         }
     }
 
@@ -216,15 +224,17 @@ public class GameManager : MonoBehaviour
     //-->Bell rang
     public void RingBell()
     {
+        _audioM.GetComponent<AudioManager>().PlaySFX(_bellSoundEffect);
         Bell.interactable = false;
         _isBattling = true;
+        _bellRang = true;
+
 
         Debug.Log("Bell rang");
         foreach (Card card in enemyPlaySlots)
         {
             ChangeCardSprite(card._cardFront, card);
         }
-        _bellRang = true;
         DeactivatePlayerCardsCollision();
         //this prevents the coroutine to start too early during the tutorial
         if (!tutorialActive)
@@ -338,6 +348,9 @@ public class GameManager : MonoBehaviour
             }
             yield return new WaitForSeconds(1);
         }
+
+        _battleOver = true;
+
         foreach (Card c in toBeReturned) {
             ReturnCardToHand(c.gameObject);
             c.ResetPlay();
@@ -355,7 +368,10 @@ public class GameManager : MonoBehaviour
         CardsDefeated();
 
         yield return new WaitForSeconds(2f);
-        StartCoroutine(EnemyTurnStart()); // Resets the opponent's hand. check if can be here or needs a different spot in case a battle should end
+        if (!tutorialActive)
+        {
+            StartCoroutine(EnemyTurnStart()); // Resets the opponent's hand. check if can be here or needs a different spot in case a battle should end
+        }
         _isBattling = false;
     }
 
@@ -410,8 +426,6 @@ public class GameManager : MonoBehaviour
     private IEnumerator Tutorial() //call at start
     {
         yield return new WaitForSeconds(2f);
-        //Pause certain parts/lengthen duration on waiting time
-        //Add text to the text below
         Debug.Log("Tutorial level");
         _speechPanel.SetActive(true);
         _speechText.text = "Welcome to the game table";
@@ -429,6 +443,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitUntil(() => _playerCardsDrawn == true);
 
         _speechText.text = "I will grab some cards as well";
+        yield return new WaitForSeconds(3.5f);
+        _speechText.text = "Before I place my cards, you got a moment to see the cards, keep this in mind";
+        yield return new WaitForSeconds(4.5f);
         StartCoroutine(EnemyTurnStart());
         yield return new WaitUntil( () => _enemyHasPlacedCards == true);
 
@@ -437,25 +454,43 @@ public class GameManager : MonoBehaviour
         _speechText.text = "And when you’re ready, ring the bell";
         yield return new WaitUntil(() => _bellRang == true);
 
+        _speechText.text = "Now the battle has initiated and my cards are now visible";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "The cards will each have a 1 on 1 battle";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "The cards that lose all their hp during a battle will perish and disappear";
+        yield return new WaitForSeconds(5.5f);
+        _speechText.text = "So be mindful about how you choose to put down your cards";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "Take a good look at the cards, which may survive a fight or even win";
+        yield return new WaitForSeconds(6.5f);
+        _speechText.text = "I'll start the battle now";
+        StartCoroutine(Battles());
+        yield return new WaitUntil(() => _battleOver == true);
+        _speechText.text = "After battle the cards that survived are returned to you";
+        yield return new WaitForSeconds(4.5f); //change to when the cards are back again
+        _speechText.text = "The cards that have survived battle will not keep any damage";
+        yield return new WaitForSeconds(5.5f);
 
-        //condition that if they hit the bell this will continue
-        //_speechText.text = "Before battle, you’ll get to see my cards for a moment before I place them";
-        //yield return new WaitForSeconds(3.5f);
+        //after battle
+        _speechText.text = "You must defeat a certain amount of creatures to defend your territory";
+        yield return new WaitForSeconds(5.5f);
+        _speechText.text = "This will be shown on the right of your ‘screen’";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "Do this within the time that during battles runs";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "For this little explanation it’s off";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "Now";
+        yield return new WaitForSeconds(3.5f);
+        _speechText.text = "Good luck! And defend what’s yours!";
+        yield return new WaitForSeconds(5.5f);
+        _speechText.text = "(You'll be send to the menu screen in 5 seconds)";
+        yield return new WaitForSeconds(5f);
 
-        /*
-        Goal of the battle
-        Why the battle
-        Draw cards *
-        See enemy cards (press 'space' to continue) *
-        Enemy cards then move to place
-        Pick cards themselves *
-        Press bell when ready *
-        Battle starts -> pauze after the cards have been turned
-        Wait with damaging and explain hp/dmg deal
-        Explain that remaining cards keep their stats by the end of battle
-        Player may always see which cards 'I' use before battle
-        Beat as many cards as needed within the time to protect your lands
-         */
+        //send player back to main menu
+        SceneManager.LoadSceneAsync("MainMenu");
+        Debug.Log("To Main Menu");
     }
 
 
@@ -463,6 +498,10 @@ public class GameManager : MonoBehaviour
     public void ContinueGame()
     {
         _pausePanel.SetActive(false);
+        if (tutorialActive)
+        {
+            _speechPanel.SetActive(true);
+        }
         Time.timeScale = 1;
         _gamePaused = false;
     }
@@ -470,6 +509,7 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         _pausePanel.SetActive(true);
+        _speechPanel.SetActive(false);
         _warningPanelPause.SetActive(false);
         Time.timeScale = 0;
     }
