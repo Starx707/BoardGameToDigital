@@ -63,6 +63,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject _audioM;
     [SerializeField] AudioClip _bellSoundEffect;
     [SerializeField] AudioClip _cardSoundEffect;
+    [SerializeField] AudioClip _pauseSoundEffect;
 
     [Header("---- Tutorial ---")]
     //Tutorial
@@ -70,7 +71,6 @@ public class GameManager : MonoBehaviour
     private bool _playerCardsDrawn;
     private bool _bellRang;
     private bool _enemyHasPlacedCards;
-    //private bool _cardsReturnedToHand;
     private bool _battleOver;
 
     [Header("---- Timer ---")]
@@ -83,6 +83,9 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        tutorialActive = StateMachine.gameState;
+        Debug.Log(tutorialActive);
+        Debug.Log(StateMachine.gameState);
         //add if not tutorial then enemy turn start otherwise don't run at all, it will get called
         if (!tutorialActive)
         {
@@ -93,7 +96,6 @@ public class GameManager : MonoBehaviour
             StartCoroutine(Tutorial());
         }
         Bell.interactable = false;
-        Debug.Log(tutorialActive);
     }
 
     //>> ------ Card game ------ <<
@@ -418,11 +420,6 @@ public class GameManager : MonoBehaviour
     }
 
     //>> ------ Tutorial ------ <<
-    public void TutorialSelected()//just make sure this gets triggered
-    {
-        tutorialActive = true; 
-    }
-
     private IEnumerator Tutorial() //call at start
     {
         yield return new WaitForSeconds(2f);
@@ -509,6 +506,7 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
+        _audioM.GetComponent<AudioManager>().PlaySFX(_pauseSoundEffect);
         _pausePanel.SetActive(true);
         _speechPanel.SetActive(false);
         _warningPanelPause.SetActive(false);

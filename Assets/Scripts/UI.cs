@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,33 +5,32 @@ public class UI : MonoBehaviour
 {
     [SerializeField] bool InGame;
     [SerializeField] private GameObject _warningPanel;
-    [SerializeField] private GameManager _gm;
+    [SerializeField] GameObject _audioM;
+
+    [Header("---- Audio ---")]
+    [SerializeField] private AudioClip _btnPressed;
+    [SerializeField] private AudioClip _pageTurn;
+    [SerializeField] private AudioClip _pauseSFX;
 
     //>> ------ Main menu ------ <<
     public void PlayGame()
     {
+        StateMachine.gameState = false;
         SceneManager.LoadSceneAsync("CardGame");
-        _gm.GetComponent<GameManager>().tutorialActive = false;
     }
 
     public void PlayTutorialGame()
     {
-        _gm.GetComponent<GameManager>().tutorialActive = true;
-        _gm.GetComponent<GameManager>().TutorialSelected();
+        StateMachine.gameState = true;
         SceneManager.LoadSceneAsync("CardGame");
     }
 
     //>> ------ Card game ------ <<
     public void ReturnToMainMenu()
     {
+        StateMachine.gameState = false;
         SceneManager.LoadSceneAsync("MainMenu");
-        _gm.GetComponent<GameManager>().tutorialActive = false;
         Time.timeScale = 1;
-    }
-
-    public void OpenBestiary()
-    {
-        //open book sound
     }
 
     //>> ------ Generally ------ <<
@@ -49,11 +46,21 @@ public class UI : MonoBehaviour
         }
     }
 
-    public void SFXBtn() //Only keep if want same sound for all btns
+    //>> ------ SFXx ------ <<
+    public void ButtonSoundEffect() //Only keep if want same sound for all btns
     {
-
+        _audioM.GetComponent<AudioManager>().PlaySFX(_btnPressed);
     }
 
+    public void PageTurnSoundEffect()
+    {
+        _audioM.GetComponent<AudioManager>().PlaySFX(_pageTurn);
+    }
+
+    public void PausedSoundEffect()
+    {
+        _audioM.GetComponent<AudioManager>().PlaySFX(_pauseSFX);
+    }
 
     //>> ------ Card game ------ <<
     public void PlayAgain()

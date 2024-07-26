@@ -10,6 +10,9 @@ public class AudioManager : MonoBehaviour
     [Header("Audio clips")]
     public AudioClip bellSoundEffect;
     public AudioClip cardSoundEffect;
+    public AudioClip pageTurnSFX;
+    public AudioClip pauseSFX;
+    public AudioClip btnPressSFX;
 
 
     public void PlaySFX(AudioClip clip)
