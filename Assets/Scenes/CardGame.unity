@@ -4167,7 +4167,7 @@ MonoBehaviour:
   _audioM: {fileID: 1032896102}
   _bellSoundEffect: {fileID: 8300000, guid: 764050a5de1874e23ad23757b94b95d1, type: 3}
   _cardSoundEffect: {fileID: 8300000, guid: 71e1b204354fb48d1a564dda028c943e, type: 3}
-  tutorialActive: 1
+  tutorialActive: 0
   TimerText: {fileID: 1404719077}
   remainingTime: 300
 --- !u!1 &694394988

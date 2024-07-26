@@ -489,6 +489,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(5f);
 
         //send player back to main menu
+        tutorialActive = false;
         SceneManager.LoadSceneAsync("MainMenu");
         Debug.Log("To Main Menu");
     }

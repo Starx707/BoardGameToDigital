@@ -13,10 +13,12 @@ public class UI : MonoBehaviour
     public void PlayGame()
     {
         SceneManager.LoadSceneAsync("CardGame");
+        _gm.GetComponent<GameManager>().tutorialActive = false;
     }
 
     public void PlayTutorialGame()
     {
+        _gm.GetComponent<GameManager>().tutorialActive = true;
         _gm.GetComponent<GameManager>().TutorialSelected();
         SceneManager.LoadSceneAsync("CardGame");
     }
@@ -25,6 +27,7 @@ public class UI : MonoBehaviour
     public void ReturnToMainMenu()
     {
         SceneManager.LoadSceneAsync("MainMenu");
+        _gm.GetComponent<GameManager>().tutorialActive = false;
         Time.timeScale = 1;
     }
 
