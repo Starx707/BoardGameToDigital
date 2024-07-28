@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public Transform[] playSlots;
     public List<Card> availableHandSlots = new List<Card>();
     public List<Card> availablePlaySlots = new List<Card>();
-    private List<Card> ToBeRetured = new List<Card>();
+    private List<Card> ReturningPlayerCards = new List<Card>();
 
     private bool _GameOver = false;
     private int _defeatedCards = 0;
@@ -64,6 +64,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioClip _bellSoundEffect;
     [SerializeField] AudioClip _cardSoundEffect;
     [SerializeField] AudioClip _pauseSoundEffect;
+    [SerializeField] AudioClip _stampSoundEffect1;
+    [SerializeField] AudioClip _stampSoundEffect2;
 
     [Header("---- Tutorial ---")]
     //Tutorial
@@ -72,6 +74,7 @@ public class GameManager : MonoBehaviour
     private bool _bellRang;
     private bool _enemyHasPlacedCards;
     private bool _battleOver;
+    public bool bestiaryOpened;
 
     [Header("---- Timer ---")]
     //Timer
@@ -84,11 +87,11 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         tutorialActive = StateMachine.gameState;
-        Debug.Log(tutorialActive);
-        Debug.Log(StateMachine.gameState);
+        //Debug.Log(tutorialActive);
         //add if not tutorial then enemy turn start otherwise don't run at all, it will get called
         if (!tutorialActive)
         {
+            Debug.Log("Coroutine called");
             StartCoroutine(EnemyTurnStart());
         }
         else
@@ -119,7 +122,6 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                Debug.Log("Max cards reached");
                 if (tutorialActive)
                 {
                     _playerCardsDrawn = true;
@@ -151,7 +153,6 @@ public class GameManager : MonoBehaviour
             card.GetComponent<Card>().StartMove(playSlots[availablePlaySlots.Count].position);
             availableHandSlots.Remove(card.GetComponent<Card>());
             availablePlaySlots.Add(card.GetComponent<Card>());
-            Debug.Log("Played");
         }
 
         for (int i = 0; i < availableHandSlots.Count; i++) //moves the cards to the left if there is space available
@@ -169,7 +170,6 @@ public class GameManager : MonoBehaviour
     //Card back to hand
     public void ReturnCardToHand(GameObject card)
     {
-        Debug.Log("Back in hand");
         if (availableHandSlots.Count < 5)
         {
             card.GetComponent<Card>().StartMove(handDeckSlots[availableHandSlots.Count].position);
@@ -183,7 +183,6 @@ public class GameManager : MonoBehaviour
     //-->Return to enemy hand
     private void ReturnToEnemyHand(GameObject card)
     {
-        Debug.Log("Back in enemy hand");
         if (availableHandSlots.Count < 5)
         {
             card.GetComponent<Card>().StartMove(enemyHandSlotsPos[enemyHandSlots.Count].position);
@@ -199,6 +198,7 @@ public class GameManager : MonoBehaviour
         _bestiary.SetActive(true);
         _page2Panel.SetActive(false);
         Time.timeScale = 0;
+        bestiaryOpened = true;
     }
 
     public void BestiaryNextpage()
@@ -232,7 +232,6 @@ public class GameManager : MonoBehaviour
         _bellRang = true;
 
 
-        Debug.Log("Bell rang");
         foreach (Card card in enemyPlaySlots)
         {
             ChangeCardSprite(card._cardFront, card);
@@ -333,16 +332,20 @@ public class GameManager : MonoBehaviour
             if (battles[i].Item1 == false)
             {
                 Destroy(availablePlaySlots[i].gameObject);
+                //Audio may need a quick fix so it won't repeat to often
+                _audioM.GetComponent<AudioManager>().PlaySFX(_stampSoundEffect1);
             }
             else
             {
                 toBeReturned.Add(availablePlaySlots[i]);
-                ToBeRetured.Add(availablePlaySlots[i]);
+                //ToBeRetured.Add(availablePlaySlots[i]);
+                ReturningPlayerCards = toBeReturned;
             }
 
             if (battles[i].Item2 == false)
             {
                 Destroy(enemyPlaySlots[i].gameObject);
+                _audioM.GetComponent<AudioManager>().PlaySFX(_stampSoundEffect2);
             }
             else
             {
@@ -364,10 +367,24 @@ public class GameManager : MonoBehaviour
         }
         availablePlaySlots.Clear();
         enemyPlaySlots.Clear();
-        ActivatePlayerCardsCollision();
+        ActivatePlayerCardsCollision(); //original
 
         _defeatedCards = _defeatedCards + 4 - enemyHandSlots.Count; //Edit this to amount cards defeated
         CardsDefeated();
+
+        if (!tutorialActive)
+        {
+            if (_defeatedCards >= GoalDefeatedCards) //do smt about the abrupt ending?
+            {
+                EndGame();
+                Debug.Log("Won");
+            }
+            else
+            {
+                Debug.Log("Not won yet");
+            }
+        }
+        
 
         yield return new WaitForSeconds(2f);
         if (!tutorialActive)
@@ -375,11 +392,11 @@ public class GameManager : MonoBehaviour
             StartCoroutine(EnemyTurnStart()); // Resets the opponent's hand. check if can be here or needs a different spot in case a battle should end
         }
         _isBattling = false;
+        //ActivatePlayerCardsCollision();
     }
 
     private void DeactivatePlayerCardsCollision()
     {
-        Debug.Log("Deactivate cards");
         foreach (Card c in availablePlaySlots) //need to save cards that have been placed when the bell was rang
         {
             c.GetComponent<Card>().DisableCard();
@@ -388,7 +405,7 @@ public class GameManager : MonoBehaviour
 
     private void ActivatePlayerCardsCollision()
     {
-        foreach (Card c in ToBeRetured)
+        foreach (Card c in ReturningPlayerCards)
         {
             c.GetComponent<Card>().EnableCard();
         }
@@ -397,25 +414,22 @@ public class GameManager : MonoBehaviour
     //---- General
     public void CardsDefeated()
     {
-        Debug.Log(_defeatedCards);
+        //Debug.Log(_defeatedCards);
         cardsBeatenTxt.text = _defeatedCards.ToString() + "/" + GoalDefeatedCards; //Shows how many cards have been defeated in total
     }
 
     private void EndGame()
     {
         _resultPanel.SetActive(true);
-        Debug.Log("Game end");
         if (_defeatedCards >= GoalDefeatedCards)
         {
-            _result.text = "Game won!";
-            _showResult.text = "Goal: " + GoalDefeatedCards + " Defeated: " + _defeatedCards;
-            Debug.Log("Game won");
+            _result.text = "Result";
+            _showResult.text = "Territory defended!";
         }
         else
         {
-            _result.text = "Game over...";
-            _showResult.text = "Goal: " + GoalDefeatedCards + " Defeated: " + _defeatedCards;
-            Debug.Log("Game lost");
+            _result.text = "Game over";
+           _showResult.text = "You've lost your territory to the enemy";
         }
     }
 
@@ -423,7 +437,6 @@ public class GameManager : MonoBehaviour
     private IEnumerator Tutorial() //call at start
     {
         yield return new WaitForSeconds(2f);
-        Debug.Log("Tutorial level");
         _speechPanel.SetActive(true);
         _speechText.text = "Welcome to the game table";
         yield return new WaitForSeconds(3.5f);
@@ -460,7 +473,7 @@ public class GameManager : MonoBehaviour
         _speechText.text = "So be mindful about how you choose to put down your cards";
         yield return new WaitForSeconds(4.5f);
         _speechText.text = "Take a good look at the cards, which may survive a fight or even win";
-        yield return new WaitForSeconds(6.5f);
+        yield return new WaitForSeconds(10.5f);
         _speechText.text = "I'll start the battle now";
         StartCoroutine(Battles());
         yield return new WaitUntil(() => _battleOver == true);
@@ -478,6 +491,14 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(4.5f);
         _speechText.text = "For this little explanation it’s off";
         yield return new WaitForSeconds(4.5f);
+        _speechText.text = "Oh! I almost forgot";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "In case you need another glance at the cards there is a beastiary";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "It's on your left";
+        yield return new WaitForSeconds(4.5f);
+        _speechText.text = "Go take a look!";
+        yield return new WaitUntil(() => bestiaryOpened == true);
         _speechText.text = "Now";
         yield return new WaitForSeconds(3.5f);
         _speechText.text = "Good luck! And defend what’s yours!";
@@ -488,7 +509,6 @@ public class GameManager : MonoBehaviour
         //send player back to main menu
         tutorialActive = false;
         SceneManager.LoadSceneAsync("MainMenu");
-        Debug.Log("To Main Menu");
     }
 
 

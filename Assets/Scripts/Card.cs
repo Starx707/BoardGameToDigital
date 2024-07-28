@@ -57,14 +57,11 @@ public class Card : MonoBehaviour
         if (hasBeenPlayed == false) 
         {
             //Move to play area
-            Debug.Log("Played");
             hasBeenPlayed = Gm.PlayCard(this.gameObject); 
-            Debug.Log(hasBeenPlayed);
         }
         else if (hasBeenPlayed == true)
         {
             //Move back to hand
-            Debug.Log("returning");
             Gm.ReturnCardToHand(this.gameObject);
             hasBeenPlayed = false;
         }
@@ -77,13 +74,11 @@ public class Card : MonoBehaviour
 
     public void DisableCard()
     {
-        Debug.Log("Disabled card collision in card");
         BoxCollider.enabled = false;
     }
 
     public void EnableCard()
     {
-        Debug.Log("Enabled card collision in card");
         BoxCollider.enabled = true;
     }
 }
